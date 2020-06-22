@@ -15,10 +15,4 @@ const tweetSchema = new Schema({
 tweetSchema.index({ text: "text" });
 let Tweet = mongoose.model("Tweet", tweetSchema);
 
-// let stream = Tweet.watch();
-
-// stream.on("change", (doc) => {
-//   console.log(doc);
-// });
-
 module.exports = Tweet;
