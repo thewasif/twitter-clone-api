@@ -122,6 +122,7 @@ const verifyAuth = (req, res) => {
 };
 
 const uploadRoute = async (req, res) => {
+  console.log("POST");
   jwt.verify(req.token, SECRET, async (err, auth) => {
     if (err) {
       console.log(err);
@@ -133,37 +134,72 @@ const uploadRoute = async (req, res) => {
     if (user.password !== auth.user.password) {
       return res.sendStatus("403");
     }
-
+    let type = req.query.type;
     const uploader = async (path) => await cloudinary.uploads(path, "Images");
     let urls = [],
       files = req.files;
     console.log(files);
+    console.log(req.query.type);
     for (let file of files) {
       const { path } = file;
       const newPath = await uploader(path);
-
       urls.push(newPath);
 
       fs.unlinkSync(path);
     }
     console.log(urls);
-    console.log();
-    User.findOneAndUpdate(
-      { _id: user._id },
-      {
-        $set: {
-          additionalData: {
-            ...user.additionalData,
-            profilePic: urls[0].url,
-            coverPhoto: urls[1].url,
+    if (type === "Both") {
+      User.findOneAndUpdate(
+        { _id: user._id },
+        {
+          $set: {
+            additionalData: {
+              ...user.additionalData,
+              profilePic: urls[0].url,
+              coverPhoto: urls[1].url,
+            },
           },
-        },
-      }
-    ).then((response) => {
-      return res.json({
-        data: urls,
+        }
+      ).then((response) => {
+        return res.json({
+          data: urls,
+        });
       });
-    });
+    } else if (type === "Profile") {
+      User.findOneAndUpdate(
+        { _id: user._id },
+        {
+          $set: {
+            additionalData: {
+              ...user.additionalData,
+              profilePic: urls[0].url,
+              coverPhoto: user.additionalData.coverPhoto,
+            },
+          },
+        }
+      ).then((response) => {
+        return res.json({
+          data: urls,
+        });
+      });
+    } else if (type === "Cover") {
+      User.findOneAndUpdate(
+        { _id: user._id },
+        {
+          $set: {
+            additionalData: {
+              ...user.additionalData,
+              profilePic: user.additionalData.profilePhoto,
+              coverPhoto: urls[0].url,
+            },
+          },
+        }
+      ).then((response) => {
+        return res.json({
+          data: urls,
+        });
+      });
+    }
   });
 };
 
