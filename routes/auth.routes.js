@@ -13,7 +13,10 @@ const {
   uploadRoute,
   follow,
   unfollow,
+  search,
+  randomuser,
 } = require("../controllers/auth.controller");
+const { response } = require("express");
 
 let SECRET = process.env.JWT_SECRET;
 
@@ -41,15 +44,10 @@ route.post("/follow", verifyToken, follow);
 //Unfollow a user
 route.post("/unfollow", verifyToken, unfollow);
 
-route.get("/randomuser", async (req, res) => {
-  let users = await User.aggregate([{ $sample: { size: 2 } }]);
-  res.send(users);
-});
+// Get random user
+route.get("/randomuser", randomuser);
 
-route.get("/search", async (req, res) => {
-  let query = req.query.q;
-  let users = await User.find({ $text: { $search: query } });
-  res.send(users);
-});
+// Search by username
+route.get("/search", search);
 
 module.exports = route;

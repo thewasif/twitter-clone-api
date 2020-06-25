@@ -7,7 +7,6 @@ const emitter = require("../events");
 let SECRET = process.env.JWT_SECRET;
 
 const signup = async (req, res) => {
-  console.log("POST coming...!!!");
   try {
     let { username, email, password } = req.body,
       createdAt = new Date();
@@ -122,7 +121,6 @@ const verifyAuth = (req, res) => {
 };
 
 const uploadRoute = async (req, res) => {
-  console.log("POST");
   jwt.verify(req.token, SECRET, async (err, auth) => {
     if (err) {
       console.log(err);
@@ -138,8 +136,6 @@ const uploadRoute = async (req, res) => {
     const uploader = async (path) => await cloudinary.uploads(path, "Images");
     let urls = [],
       files = req.files;
-    console.log(files);
-    console.log(req.query.type);
     for (let file of files) {
       const { path } = file;
       const newPath = await uploader(path);
@@ -147,7 +143,6 @@ const uploadRoute = async (req, res) => {
 
       fs.unlinkSync(path);
     }
-    console.log(urls);
     if (type === "Both") {
       User.findOneAndUpdate(
         { _id: user._id },
@@ -189,7 +184,7 @@ const uploadRoute = async (req, res) => {
           $set: {
             additionalData: {
               ...user.additionalData,
-              profilePic: user.additionalData.profilePhoto,
+              profilePic: user.additionalData.profilePic,
               coverPhoto: urls[0].url,
             },
           },
@@ -268,6 +263,17 @@ const unfollow = (req, res) => {
   });
 };
 
+const search = async (req, res) => {
+  let query = req.query.q;
+  let users = await User.find({ $text: { $search: query } });
+  return res.send(users);
+};
+
+const randomuser = async (req, res) => {
+  let users = await User.aggregate([{ $sample: { size: 3 } }]);
+  return res.send(users);
+};
+
 module.exports = {
   signup,
   login,
@@ -277,4 +283,6 @@ module.exports = {
   uploadRoute,
   follow,
   unfollow,
+  search,
+  randomuser,
 };

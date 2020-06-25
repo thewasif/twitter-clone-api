@@ -8,7 +8,6 @@ let SECRET = process.env.JWT_SECRET;
 
 const postTweet = async (req, res) => {
   let { text } = req.body;
-
   jwt.verify(req.token, SECRET, async (err, auth) => {
     if (err) return res.sendStatus("403");
     let user = await User.findById(auth.user._id);
@@ -91,8 +90,6 @@ const replyTweet = (req, res) => {
           })
             .sort({ time: -1 })
             .then((res) => {
-              console.log(user);
-              console.log("res", res);
               if (user._id != res.userID) {
                 emitter.emit("reply", user.username, orgTweetID, res.userID);
               }
@@ -142,12 +139,9 @@ const likeTweet = (req, res) => {
 
 const unlikeTweet = (req, res) => {
   let { tweetID } = req.body;
-  console.log("POST", tweetID);
 
   jwt.verify(req.token, SECRET, async (err, auth) => {
-    console.log("heee");
     if (err) return res.sendStatus("403");
-    console.log("booo");
 
     let user = await User.findById(auth.user._id);
 
@@ -159,7 +153,6 @@ const unlikeTweet = (req, res) => {
         { $pull: { hearts: auth.user._id } }
       )
         .then((response) => {
-          console.log(response);
           res.send(response);
         })
         .catch((e) => {
@@ -187,7 +180,6 @@ const getTweet = async (req, res) => {
 const getReplies = async (req, res) => {
   let { tweetID } = req.body;
   let tweets = await Tweet.find({ repliedTo: tweetID });
-  console.log(tweets);
   if (tweets) {
     return res.send(tweets);
   } else {
