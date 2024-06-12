@@ -6,8 +6,15 @@ require("dotenv").config();
 const auth = require("./routes/auth.routes");
 const tweet = require("./routes/tweet.routes");
 const notifications = require("./routes/notification.routes");
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs')
+const jsyaml = require('js-yaml');
+const spec = fs.readFileSync('swagger.yml', 'utf8');
+const swaggerDocument = jsyaml.load(spec);
 
 const app = express();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Middlewares
 app.use(express.json({ limit: "20mb" }));

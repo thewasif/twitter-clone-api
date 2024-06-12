@@ -1,0 +1,540 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Twitter-like API
+basePath: /api
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: User Operations
+    description: Operations related to user management
+  - name: Tweet Operations
+    description: Operations related to tweets
+  - name: Notification Operations
+    description: Operations related to notifications
+paths:
+  /user/signup:
+    post:
+      tags:
+        - Authentication
+      summary: Create a new user account
+      description: Creates a new user account with provided username, email, and password
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: User signup details
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: User signed up successfully
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        400:
+          description: User already exists or invalid input
+  /user/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticates the user with provided credentials and returns a JWT token
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: User login details
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: User logged in successfully
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        403:
+          description: Invalid credentials
+  /user/editInfo:
+    put:
+      tags:
+        - User Operations
+      summary: Edit user information
+      description: Edit user information such as additional data
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Updated user information
+          required: true
+          schema:
+            type: object
+            properties:
+              additionalData:
+                type: object
+      responses:
+        200:
+          description: User information updated successfully
+        403:
+          description: Unauthorized access
+  /user/:
+    get:
+      tags:
+        - User Operations
+      summary: Get user information
+      description: Retrieve user information by username or user ID
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: username
+          type: string
+        - in: query
+          name: userID
+          type: string
+      responses:
+        200:
+          description: User information retrieved successfully
+          schema:
+            type: object
+        404:
+          description: User not found
+  /user/verifyAuth:
+    get:
+      tags:
+        - Authentication
+      summary: Verify user authentication
+      description: Verify user authentication using JWT token
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: JWT_TOKEN
+          type: string
+          required: true
+      responses:
+        200:
+          description: User authentication verified successfully
+          schema:
+            type: object
+        403:
+          description: Unauthorized access
+  /user/uploadRoute:
+    post:
+      tags:
+        - User Operations
+      summary: Upload user images
+      description: Upload user images to cloud storage and update user information
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: formData
+          name: type
+          type: string
+          enum: [Both, Profile, Cover]
+        - in: formData
+          name: files
+          type: file
+          description: Image files to upload
+          required: true
+      responses:
+        200:
+          description: Images uploaded and user information updated successfully
+        403:
+          description: Unauthorized access or error uploading images
+  /user/follow:
+    post:
+      tags:
+        - User Operations
+      summary: Follow a user
+      description: Follow another user
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: query
+          name: userToBeFollowed
+          type: string
+          required: true
+      responses:
+        200:
+          description: User followed successfully
+        403:
+          description: Unauthorized access
+  /user/unfollow:
+    post:
+      tags:
+        - User Operations
+      summary: Unfollow a user
+      description: Unfollow a user previously followed
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: query
+          name: userToBeUnFollowed
+          type: string
+          required: true
+      responses:
+        200:
+          description: User unfollowed successfully
+        403:
+          description: Unauthorized access
+  /user/search:
+    get:
+      tags:
+        - User Operations
+      summary: Search users
+      description: Search for users by username
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: q
+          type: string
+          required: true
+      responses:
+        200:
+          description: Users found matching search query
+          schema:
+            type: array
+            items:
+              type: object
+        404:
+          description: No users found matching search query
+  /user/randomuser:
+    get:
+      tags:
+        - User Operations
+      summary: Get random users
+      description: Retrieve random users from the database
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Random users retrieved successfully
+          schema:
+            type: array
+            items:
+              type: object
+  /tweet/:
+    post:
+      tags:
+        - Tweet Operations
+      summary: Post a new tweet
+      description: Create and post a new tweet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Tweet text to post
+          required: true
+          schema:
+            type: object
+            properties:
+              text:
+                type: string
+      responses:
+        200:
+          description: Tweet posted successfully
+          schema:
+            type: object
+        400:
+          description: User not found or invalid input
+        403:
+          description: Unauthorized access
+  /tweet/getTweets:
+    get:
+      tags:
+        - Tweet Operations
+      summary: Get tweets by user
+      description: Retrieve tweets by a specific user
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: username
+          type: string
+      responses:
+        200:
+          description: Tweets retrieved successfully
+          schema:
+            type: array
+            items:
+              type: object
+  /tweet/replyTweet:
+    post:
+      tags:
+        - Tweet Operations
+      summary: Reply to a tweet
+      description: Reply to a tweet with a new tweet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Reply tweet details
+          required: true
+          schema:
+            type: object
+            properties:
+              text:
+                type: string
+              orgTweetID:
+                type: string
+      responses:
+        200:
+          description: Reply tweet posted successfully
+          schema:
+            type: object
+        400:
+          description: User not found or invalid input
+        403:
+          description: Unauthorized access
+  /tweet/likeTweet:
+    post:
+      tags:
+        - Tweet Operations
+      summary: Like a tweet
+      description: Like a tweet by its ID
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Tweet ID to like
+          required: true
+          schema:
+            type: object
+            properties:
+              tweetID:
+                type: string
+      responses:
+        200:
+          description: Tweet liked successfully
+          schema:
+            type: object
+        400:
+          description: User not found or invalid input
+        403:
+          description: Unauthorized access
+  /tweet/unlikeTweet:
+    post:
+      tags:
+        - Tweet Operations
+      summary: Unlike a tweet
+      description: Unlike a previously liked tweet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Tweet ID to unlike
+          required: true
+          schema:
+            type: object
+            properties:
+              tweetID:
+                type: string
+      responses:
+        200:
+          description: Tweet unliked successfully
+          schema:
+            type: object
+        400:
+          description: User not found or invalid input
+        403:
+          description: Unauthorized access
+  /tweet/getTweet/{id}:
+    get:
+      tags:
+        - Tweet Operations
+      summary: Get tweet by ID
+      description: Retrieve a tweet by its ID
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Tweet ID
+      responses:
+        200:
+          description: Tweet retrieved successfully
+          schema:
+            type: object
+        404:
+          description: Tweet not found
+  /tweet/getReplies:
+    get:
+      tags:
+        - Tweet Operations
+      summary: Get replies to a tweet
+      description: Retrieve replies to a specific tweet
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Tweet ID to retrieve replies for
+          required: true
+          schema:
+            type: object
+            properties:
+              tweetID:
+                type: string
+      responses:
+        200:
+          description: Replies retrieved successfully
+          schema:
+            type: array
+            items:
+              type: object
+        400:
+          description: User not found
+  /tweet/newsfeed:
+    get:
+      tags:
+        - Tweet Operations
+      summary: Get user's newsfeed
+      description: Retrieve tweets from users that the authenticated user follows
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Newsfeed retrieved successfully
+          schema:
+            type: array
+            items:
+              type: object
+        400:
+          description: User not found
+        403:
+          description: Unauthorized access
+  /notifications/getNotifications:
+    get:
+      tags:
+        - Notification Operations
+      summary: Get notifications
+      description: Retrieve notifications for the authenticated user
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Notifications retrieved successfully
+          schema:
+            type: array
+            items:
+              type: object
+        403:
+          description: Unauthorized access
+  /notifications/readNotifications:
+    post:
+      tags:
+        - Notification Operations
+      summary: Mark notification as read
+      description: Mark a notification as read for the authenticated user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Notification ID to mark as read
+          required: true
+          schema:
+            type: object
+            properties:
+              notificationID:
+                type: string
+      responses:
+        200:
+          description: Notification marked as read successfully
+          schema:
+            type: object
+        403:
+          description: Unauthorized access or error marking notification as read
