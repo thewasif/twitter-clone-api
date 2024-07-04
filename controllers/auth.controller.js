@@ -200,7 +200,7 @@ const uploadRoute = async (req, res) => {
 
 const follow = (req, res) => {
   let { userToBeFollowed } = req.query;
-
+  
   jwt.verify(req.token, SECRET, async (err, auth) => {
     if (err) res.sendStatus("403");
 

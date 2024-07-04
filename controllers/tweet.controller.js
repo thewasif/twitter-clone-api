@@ -42,7 +42,7 @@ const postTweet = async (req, res) => {
 
 const getTweets = (req, res) => {
   let { username } = req.query;
-
+  
   if (username) {
     User.findOne({ username })
       .then((response) => {

@@ -293,7 +293,7 @@ paths:
           description: User not found or invalid input
         403:
           description: Unauthorized access
-  /tweet/getTweets:
+  /tweet:
     get:
       tags:
         - Tweet Operations
