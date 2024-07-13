@@ -79,8 +79,8 @@ paths:
                 type: string
         403:
           description: Invalid credentials
-  /user/editInfo:
-    put:
+  /user/editprofile:
+    post:
       tags:
         - User Operations
       summary: Edit user information
@@ -150,7 +150,7 @@ paths:
             type: object
         403:
           description: Unauthorized access
-  /user/uploadRoute:
+  /user/upload:
     post:
       tags:
         - User Operations
@@ -170,7 +170,7 @@ paths:
           type: string
           enum: [Both, Profile, Cover]
         - in: formData
-          name: files
+          name: image
           type: file
           description: Image files to upload
           required: true
@@ -312,7 +312,7 @@ paths:
             type: array
             items:
               type: object
-  /tweet/replyTweet:
+  /tweet/reply:
     post:
       tags:
         - Tweet Operations
@@ -347,7 +347,7 @@ paths:
           description: User not found or invalid input
         403:
           description: Unauthorized access
-  /tweet/likeTweet:
+  /tweet/like:
     post:
       tags:
         - Tweet Operations
@@ -380,7 +380,7 @@ paths:
           description: User not found or invalid input
         403:
           description: Unauthorized access
-  /tweet/unlikeTweet:
+  /tweet/unlike:
     post:
       tags:
         - Tweet Operations
@@ -413,7 +413,7 @@ paths:
           description: User not found or invalid input
         403:
           description: Unauthorized access
-  /tweet/getTweet/{id}:
+  /tweet/{id}:
     get:
       tags:
         - Tweet Operations
@@ -435,7 +435,7 @@ paths:
         404:
           description: Tweet not found
   /tweet/getReplies:
-    get:
+    post:
       tags:
         - Tweet Operations
       summary: Get replies to a tweet
@@ -462,7 +462,7 @@ paths:
         400:
           description: User not found
   /tweet/newsfeed:
-    get:
+    post:
       tags:
         - Tweet Operations
       summary: Get user's newsfeed

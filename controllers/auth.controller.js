@@ -132,7 +132,7 @@ const uploadRoute = async (req, res) => {
     if (user.password !== auth.user.password) {
       return res.sendStatus("403");
     }
-    let type = req.query.type;
+    let type = req.body.type;
     const uploader = async (path) => await cloudinary.uploads(path, "Images");
     let urls = [],
       files = req.files;
