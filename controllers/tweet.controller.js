@@ -188,6 +188,7 @@ const getReplies = async (req, res) => {
 };
 
 const newsfeed = (req, res) => {
+  console.log('here')
   jwt.verify(req.token, SECRET, async (err, auth) => {
     if (err) return res.sendStatus("403");
 
@@ -200,7 +201,6 @@ const newsfeed = (req, res) => {
       let following = user.following;
 
       let tweets = await Tweet.find({
-        userID: { $in: following },
         repliedTo: null,
       }).sort({ time: -1 });
 
