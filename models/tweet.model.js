@@ -8,7 +8,7 @@ const tweetSchema = new Schema({
   retweets: Array,
   replies: Array,
   time: Date,
-  userID: String,
+  userID:  [{ type: Schema.Types.ObjectId, ref: 'User' }],
   repliedTo: mongoose.Schema.Types.ObjectId,
 });
 

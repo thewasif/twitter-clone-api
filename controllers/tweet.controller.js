@@ -188,7 +188,6 @@ const getReplies = async (req, res) => {
 };
 
 const newsfeed = (req, res) => {
-  console.log('here')
   jwt.verify(req.token, SECRET, async (err, auth) => {
     if (err) return res.sendStatus("403");
 
@@ -200,9 +199,10 @@ const newsfeed = (req, res) => {
       // user authenticated..!
       let following = user.following;
 
-      let tweets = await Tweet.find({
-        repliedTo: null,
-      }).sort({ time: -1 });
+      // get all tweets with it's user populated
+        let tweets = await Tweet.find({  })
+            .populate("userID")
+            .sort({ time: -1 });
 
       res.send(tweets);
     } else {
